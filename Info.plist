@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict/>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>PlateUp needs access to your camera to take photos of your meals for nutritional analysis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PlateUp needs access to your photo library to select photos of your meals for nutritional analysis.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PlateUp needs access to your microphone to record voice descriptions of your meals for more accurate nutritional analysis.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>PlateUp uses speech recognition to convert your voice descriptions of meals into text for nutritional analysis.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>background-processing</string>
+		<string>background-fetch</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>GoogleSignIn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.776236357159-n88885erb598jg9kb0afn0ula88upt3h</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

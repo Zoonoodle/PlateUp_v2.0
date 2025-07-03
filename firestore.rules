@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidUser() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    // Onboarding collection - temporary data
+    match /onboarding/{sessionId} {
+      allow read, write: if isAuthenticated();
+      allow delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.userId ||
+        request.auth.token.admin == true
+      );
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && (
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['id', 'createdAt'])
+      );
+      allow delete: if isOwner(userId);
+    }
+    
+    // Meals collection
+    match /meals/{mealId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Coaching insights collection
+    match /coaching_insights/{insightId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if false; // Only created by Cloud Functions
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && (
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['dismissedAt', 'userFeedback', 'isActive'])
+      );
+      allow delete: if false; // Insights should expire, not be deleted
+    }
+    
+    // Clarification feedback collection
+    match /clarification_feedback/{feedbackId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if false; // Feedback should be immutable
+      allow delete: if false;
+    }
+    
+    // Admin access for debugging (remove in production)
+    match /{document=**} {
+      allow read, write: if isAuthenticated() && request.auth.token.admin == true;
+    }
+  }
+}

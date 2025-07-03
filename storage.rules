@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isAudio() {
+      return request.resource.contentType.matches('audio/.*');
+    }
+    
+    function isValidSize() {
+      // Max 10MB for images, 5MB for audio
+      return (isImage() && request.resource.size <= 10 * 1024 * 1024) ||
+             (isAudio() && request.resource.size <= 5 * 1024 * 1024);
+    }
+    
+    // User meal images
+    match /users/{userId}/meals/{mealId}/images/{imageId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isImage() && isValidSize();
+    }
+    
+    // User meal audio recordings
+    match /users/{userId}/meals/{mealId}/audio/{audioId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isAudio() && isValidSize();
+    }
+    
+    // User profile images
+    match /users/{userId}/profile/{imageId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isImage() && isValidSize();
+    }
+    
+    // Temporary uploads (for processing)
+    match /temp/{userId}/{fileId} {
+      allow read, write: if isOwner(userId) && isValidSize();
+      // These should be cleaned up after processing
+    }
+  }
+}
